@@ -1,0 +1,1400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GYM FIT</title>
+    <link rel="stylesheet" href="style fit.css">
+</head>
+
+<body>
+
+    <!-- ================= SPLASH SCREEN ================= -->
+    <div id="splashScreen" class="splash-screen">
+
+        <div class="splash-logo">
+            <span>GYM</span><strong>FIT</strong>
+        </div>
+
+        <div class="splash-line"></div>
+
+        <p>TRAIN • BUILD • BECOME</p>
+
+    </div>
+
+
+    <!-- ================= LOGIN SCREEN ================= -->
+    <div id="authScreen" class="auth-screen hidden">
+
+        <div class="auth-box">
+
+            <div class="auth-logo">
+                GYM<strong>FIT</strong>
+            </div>
+
+            <div class="auth-badge">YOUR FITNESS JOURNEY</div>
+
+            <h1>Welcome Back</h1>
+
+            <p class="auth-subtitle">
+                Login to continue your fitness journey.
+            </p>
+
+            <form id="loginForm">
+
+                <div class="input-group">
+                    <label>Your Name</label>
+                    <input
+                        type="text"
+                        id="loginName"
+                        placeholder="Enter your name"
+                        required
+                    >
+                </div>
+
+                <div class="input-group">
+                    <label>Email</label>
+                    <input
+                        type="email"
+                        id="loginEmail"
+                        placeholder="Enter your email"
+                        required
+                    >
+                </div>
+
+                <div class="input-group">
+                    <label>Password</label>
+                    <input
+                        type="password"
+                        id="loginPassword"
+                        placeholder="Minimum 6 characters"
+                        minlength="6"
+                        required
+                    >
+                </div>
+
+                <button type="submit" class="auth-btn">
+                    LOGIN →
+                </button>
+
+            </form>
+
+            <p class="auth-note">
+                Your data is saved on this device.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================= PROFILE SETUP POPUP ================= -->
+    <div id="profileSetup" class="profile-overlay hidden">
+
+        <div class="profile-popup">
+
+            <div class="setup-header">
+
+                <div>
+                    <span class="setup-small">
+                        PROFILE SETUP
+                    </span>
+
+                    <h2>Let's know you better</h2>
+
+                    <p>
+                        This helps GYM FIT personalize your journey.
+                    </p>
+                </div>
+
+                <div class="setup-progress">
+                    <span></span>
+                </div>
+
+            </div>
+
+
+            <!-- GENDER -->
+
+            <div class="setup-section">
+
+                <h3>What's your gender?</h3>
+
+                <p class="setup-hint">
+                    Choose one
+                </p>
+
+                <div class="gender-options">
+
+                    <button
+                        type="button"
+                        class="gender-card"
+                        data-gender="Male"
+                    >
+
+                        <div class="gender-visual male-visual">
+
+                            <div class="character-shadow"></div>
+
+                            <div class="character-head male-head">
+                                <span>👨</span>
+                            </div>
+
+                            <div class="character-body male-body">
+                                <i></i>
+                            </div>
+
+                            <div class="character-arm arm-left"></div>
+                            <div class="character-arm arm-right"></div>
+
+                            <div class="character-leg leg-left"></div>
+                            <div class="character-leg leg-right"></div>
+
+                        </div>
+
+                        <strong>Male</strong>
+                        <small>Man</small>
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="gender-card"
+                        data-gender="Female"
+                    >
+
+                        <div class="gender-visual female-visual">
+
+                            <div class="character-shadow"></div>
+
+                            <div class="character-head female-head">
+                                <span>👩</span>
+                            </div>
+
+                            <div class="character-body female-body">
+                                <i></i>
+                            </div>
+
+                            <div class="character-arm arm-left"></div>
+                            <div class="character-arm arm-right"></div>
+
+                            <div class="character-leg leg-left"></div>
+                            <div class="character-leg leg-right"></div>
+
+                        </div>
+
+                        <strong>Female</strong>
+                        <small>Woman</small>
+
+                    </button>
+
+                </div>
+
+                <input type="hidden" id="genderInput">
+
+            </div>
+
+
+            <!-- AGE -->
+
+            <div class="setup-section">
+
+                <label for="ageInput">
+                    Age
+                </label>
+
+                <div class="number-input">
+
+                    <input
+                        type="number"
+                        id="ageInput"
+                        min="10"
+                        max="100"
+                        placeholder="Enter your age"
+                    >
+
+                    <span>years</span>
+
+                </div>
+
+            </div>
+
+
+            <!-- HEIGHT -->
+
+            <div class="setup-section">
+
+                <label for="heightInput">
+                    Height
+                </label>
+
+                <div class="number-input">
+
+                    <input
+                        type="number"
+                        id="heightInput"
+                        min="100"
+                        max="250"
+                        placeholder="Enter your height"
+                    >
+
+                    <span>cm</span>
+
+                </div>
+
+            </div>
+
+
+            <!-- WEIGHT -->
+
+            <div class="setup-section">
+
+                <label for="weightInput">
+                    Weight
+                </label>
+
+                <div class="number-input">
+
+                    <input
+                        type="number"
+                        id="weightInput"
+                        min="25"
+                        max="300"
+                        placeholder="Enter your weight"
+                    >
+
+                    <span>kg</span>
+
+                </div>
+
+            </div>
+
+
+            <!-- GOAL -->
+
+            <div class="setup-section">
+
+                <h3>What's your goal?</h3>
+
+                <p class="setup-hint">
+                    Select your primary fitness goal
+                </p>
+
+                <div class="goal-options">
+
+                    <button
+                        type="button"
+                        class="goal-card"
+                        data-goal="Muscle Gain"
+                    >
+                        <span>💪</span>
+                        <strong>Muscle Gain</strong>
+                    </button>
+
+                    <button
+                        type="button"
+                        class="goal-card"
+                        data-goal="Fat Loss"
+                    >
+                        <span>🔥</span>
+                        <strong>Fat Loss</strong>
+                    </button>
+
+                    <button
+                        type="button"
+                        class="goal-card"
+                        data-goal="Fitness"
+                    >
+                        <span>🏃</span>
+                        <strong>Fitness</strong>
+                    </button>
+
+                    <button
+                        type="button"
+                        class="goal-card"
+                        data-goal="Strength"
+                    >
+                        <span>🏋️</span>
+                        <strong>Strength</strong>
+                    </button>
+
+                </div>
+
+                <input type="hidden" id="goalInput">
+
+            </div>
+
+
+            <button
+                type="button"
+                id="saveProfileBtn"
+                class="continue-profile-btn"
+            >
+                CONTINUE →
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================= APP ================= -->
+
+    <div class="app" id="mainApp">
+
+        <!-- TOP BAR -->
+
+        <header class="topbar">
+
+            <div>
+
+                <div class="brand">
+                    GYM<span>FIT</span>
+                </div>
+
+                <p class="hello" id="helloText">
+                    Let's get stronger 💪
+                </p>
+
+            </div>
+
+            <button
+                class="profile-btn"
+                onclick="showPage('profile')"
+            >
+                👤
+            </button>
+
+        </header>
+
+
+        <!-- ================= HOME ================= -->
+
+        <main id="home" class="page active">
+
+            <section class="hero-card">
+
+                <div class="hero-text">
+
+                    <p class="small-title">
+                        TODAY'S MOTIVATION
+                    </p>
+
+                    <h1>
+                        Train hard.<br>
+                        Stay strong.
+                    </h1>
+
+                    <p>
+                        Every workout takes you one step
+                        closer to your goal.
+                    </p>
+
+                    <button
+                        class="primary-btn"
+                        onclick="showPage('workout')"
+                    >
+                        START WORKOUT →
+                    </button>
+
+                </div>
+
+                <div class="hero-icon">
+                    🏋️
+                </div>
+
+            </section>
+
+
+            <!-- STATS -->
+
+            <section class="stats-grid">
+
+                <div class="stat-card">
+
+                    <div class="stat-icon">
+                        🔥
+                    </div>
+
+                    <h2 id="streak">
+                        1
+                    </h2>
+
+                    <p>
+                        Day Streak
+                    </p>
+
+                </div>
+
+
+                <div
+                    class="stat-card water-card"
+                    title="Tap to add water"
+                >
+
+                    <div class="stat-icon">
+                        💧
+                    </div>
+
+                    <h2 id="water">
+                        0
+                    </h2>
+
+                    <p>
+                        Glasses
+                    </p>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon">
+                        🏃
+                    </div>
+
+                    <h2>
+                        1.6
+                    </h2>
+
+                    <p>
+                        KM Run
+                    </p>
+
+                </div>
+
+            </section>
+
+
+            <!-- TODAY -->
+
+            <section class="section">
+
+                <div class="section-heading">
+
+                    <h2>
+                        Today's Plan
+                    </h2>
+
+                    <span>
+                        View all
+                    </span>
+
+                </div>
+
+
+                <div
+                    class="workout-card"
+                    onclick="showPage('workout')"
+                >
+
+                    <div class="workout-image">
+                        🏋️
+                    </div>
+
+                    <div class="workout-info">
+
+                        <span class="tag">
+                            WORKOUT
+                        </span>
+
+                        <h3>
+                            Full Body Training
+                        </h3>
+
+                        <p>
+                            6 Exercises • 25 Minutes
+                        </p>
+
+                        <div class="mini-progress">
+                            <div></div>
+                        </div>
+
+                    </div>
+
+                    <div class="arrow">
+                        →
+                    </div>
+
+                </div>
+
+
+                <div
+                    class="workout-card"
+                    onclick="showPage('running')"
+                >
+
+                    <div class="workout-image running-icon">
+                        🏃
+                    </div>
+
+                    <div class="workout-info">
+
+                        <span class="tag running-tag">
+                            RUNNING
+                        </span>
+
+                        <h3>
+                            1600 Meter Run
+                        </h3>
+
+                        <p>
+                            Build stamina • Daily
+                        </p>
+
+                        <div class="mini-progress">
+                            <div></div>
+                        </div>
+
+                    </div>
+
+                    <div class="arrow">
+                        →
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- CHALLENGE -->
+
+            <section class="challenge-card">
+
+                <div>
+
+                    <span class="challenge-label">
+                        30 DAY CHALLENGE
+                    </span>
+
+                    <h2>
+                        Army Fitness Challenge
+                    </h2>
+
+                    <p>
+                        Complete today's challenge
+                        and keep your streak alive.
+                    </p>
+
+                    <button
+                        class="secondary-btn"
+                        onclick="showPage('challenge')"
+                    >
+                        VIEW CHALLENGE
+                    </button>
+
+                </div>
+
+                <div class="challenge-number">
+
+                    <strong id="homeChallengeDay">
+                        01
+                    </strong>
+
+                    <span>
+                        /30
+                    </span>
+
+                </div>
+
+            </section>
+
+        </main>
+
+
+        <!-- ================= WORKOUT ================= -->
+
+        <main id="workout" class="page">
+
+            <div class="page-title">
+
+                <span>
+                    TRAINING
+                </span>
+
+                <h1>
+                    Workout
+                </h1>
+
+                <p>
+                    Choose your workout for today.
+                </p>
+
+            </div>
+
+
+            <div class="level-grid">
+
+                <div
+                    class="level-card"
+                    onclick="selectLevel('Beginner')"
+                >
+
+                    <span>🌱</span>
+
+                    <h3>
+                        Beginner
+                    </h3>
+
+                    <p>
+                        Start your fitness journey
+                    </p>
+
+                </div>
+
+
+                <div
+                    class="level-card"
+                    onclick="selectLevel('Intermediate')"
+                >
+
+                    <span>🔥</span>
+
+                    <h3>
+                        Intermediate
+                    </h3>
+
+                    <p>
+                        Push your limits
+                    </p>
+
+                </div>
+
+
+                <div
+                    class="level-card"
+                    onclick="selectLevel('Advanced')"
+                >
+
+                    <span>⚡</span>
+
+                    <h3>
+                        Advanced
+                    </h3>
+
+                    <p>
+                        Train like a beast
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <section class="section">
+
+                <div class="section-heading">
+
+                    <h2>
+                        Today's Exercises
+                    </h2>
+
+                </div>
+
+
+                <div class="exercise-list">
+
+                    <div class="exercise">
+
+                        <div class="exercise-icon">
+                            💪
+                        </div>
+
+                        <div>
+                            <h3>
+                                Push Ups
+                            </h3>
+
+                            <p>
+                                3 Sets × 15 Reps
+                            </p>
+                        </div>
+
+                        <span>
+                            →
+                        </span>
+
+                    </div>
+
+
+                    <div class="exercise">
+
+                        <div class="exercise-icon">
+                            🦵
+                        </div>
+
+                        <div>
+                            <h3>
+                                Squats
+                            </h3>
+
+                            <p>
+                                3 Sets × 20 Reps
+                            </p>
+                        </div>
+
+                        <span>
+                            →
+                        </span>
+
+                    </div>
+
+
+                    <div class="exercise">
+
+                        <div class="exercise-icon">
+                            🏋️
+                        </div>
+
+                        <div>
+                            <h3>
+                                Pull Ups
+                            </h3>
+
+                            <p>
+                                3 Sets × 8 Reps
+                            </p>
+                        </div>
+
+                        <span>
+                            →
+                        </span>
+
+                    </div>
+
+
+                    <div class="exercise">
+
+                        <div class="exercise-icon">
+                            🔥
+                        </div>
+
+                        <div>
+                            <h3>
+                                Plank
+                            </h3>
+
+                            <p>
+                                3 Sets × 45 Seconds
+                            </p>
+                        </div>
+
+                        <span>
+                            →
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <button
+                class="complete-btn"
+                onclick="completeWorkout()"
+            >
+                ✓ COMPLETE WORKOUT
+            </button>
+
+        </main>
+
+
+        <!-- ================= RUNNING ================= -->
+
+        <main id="running" class="page">
+
+            <div class="page-title">
+
+                <span>
+                    CARDIO
+                </span>
+
+                <h1>
+                    Running
+                </h1>
+
+                <p>
+                    Build your stamina every day.
+                </p>
+
+            </div>
+
+
+            <div class="run-card">
+
+                <div class="run-circle">
+
+                    <strong>
+                        1.6
+                    </strong>
+
+                    <span>
+                        KM
+                    </span>
+
+                </div>
+
+                <h2>
+                    1600 Meter Run
+                </h2>
+
+                <p>
+                    Today's running target
+                </p>
+
+                <button
+                    class="primary-btn"
+                    id="runButton"
+                    onclick="startRun()"
+                >
+                    START RUN
+                </button>
+
+            </div>
+
+
+            <div class="stats-grid">
+
+                <div class="stat-card">
+
+                    <h2>
+                        1.6
+                    </h2>
+
+                    <p>
+                        Distance KM
+                    </p>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <h2 id="runTime">
+                        --
+                    </h2>
+
+                    <p>
+                        Time
+                    </p>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <h2 id="runPace">
+                        --
+                    </h2>
+
+                    <p>
+                        Pace
+                    </p>
+
+                </div>
+
+            </div>
+
+        </main>
+
+
+        <!-- ================= CHALLENGE ================= -->
+
+        <main id="challenge" class="page">
+
+            <div class="page-title">
+
+                <span>
+                    GYM FIT CHALLENGE
+                </span>
+
+                <h1>
+                    30 Days
+                </h1>
+
+                <p>
+                    One day at a time. No excuses.
+                </p>
+
+            </div>
+
+
+            <div class="challenge-progress">
+
+                <div class="progress-header">
+
+                    <span>
+                        Overall Progress
+                    </span>
+
+                    <strong id="progressPercent">
+                        0%
+                    </strong>
+
+                </div>
+
+                <div class="progress-bar">
+
+                    <div id="progressBar"></div>
+
+                </div>
+
+            </div>
+
+
+            <div
+                class="day-grid"
+                id="dayGrid"
+            ></div>
+
+
+            <div class="daily-challenge">
+
+                <span>
+                    TODAY'S CHALLENGE
+                </span>
+
+                <h2 id="challengeDayTitle">
+                    Day 1
+                </h2>
+
+                <div class="challenge-exercises">
+
+                    <div>
+
+                        <strong id="challengePushups">
+                            20
+                        </strong>
+
+                        <span>
+                            Push Ups
+                        </span>
+
+                    </div>
+
+
+                    <div>
+
+                        <strong id="challengeSquats">
+                            20
+                        </strong>
+
+                        <span>
+                            Squats
+                        </span>
+
+                    </div>
+
+
+                    <div>
+
+                        <strong id="challengePullups">
+                            5
+                        </strong>
+
+                        <span>
+                            Pull Ups
+                        </span>
+
+                    </div>
+
+
+                    <div>
+
+                        <strong>
+                            1.6
+                        </strong>
+
+                        <span>
+                            KM Run
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <button
+                    class="complete-btn"
+                    id="completeChallengeBtn"
+                    onclick="completeChallenge()"
+                >
+                    ✓ COMPLETE DAY 1
+                </button>
+
+            </div>
+
+        </main>
+
+
+        <!-- ================= PROGRESS ================= -->
+
+        <main id="progress" class="page">
+
+            <div class="page-title">
+
+                <span>
+                    YOUR JOURNEY
+                </span>
+
+                <h1>
+                    Progress
+                </h1>
+
+                <p>
+                    See how far you've come.
+                </p>
+
+            </div>
+
+
+            <div class="big-progress">
+
+                <div class="progress-circle">
+
+                    <strong id="bigProgress">
+                        0%
+                    </strong>
+
+                    <span>
+                        Challenge
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="stats-grid">
+
+                <div class="stat-card">
+
+                    <div class="stat-icon">
+                        🏋️
+                    </div>
+
+                    <h2 id="workoutCount">
+                        0
+                    </h2>
+
+                    <p>
+                        Workouts
+                    </p>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon">
+                        📅
+                    </div>
+
+                    <h2 id="dayCount">
+                        0
+                    </h2>
+
+                    <p>
+                        Days Done
+                    </p>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon">
+                        🔥
+                    </div>
+
+                    <h2 id="progressStreak">
+                        1
+                    </h2>
+
+                    <p>
+                        Streak
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <section class="section">
+
+                <div class="section-heading">
+
+                    <h2>
+                        Weekly Activity
+                    </h2>
+
+                </div>
+
+                <div class="activity-card">
+
+                    <div class="activity-bar">
+                        <span style="height:40%"></span>
+                        <small>Mon</small>
+                    </div>
+
+                    <div class="activity-bar">
+                        <span style="height:65%"></span>
+                        <small>Tue</small>
+                    </div>
+
+                    <div class="activity-bar">
+                        <span style="height:30%"></span>
+                        <small>Wed</small>
+                    </div>
+
+                    <div class="activity-bar">
+                        <span style="height:80%"></span>
+                        <small>Thu</small>
+                    </div>
+
+                    <div class="activity-bar">
+                        <span style="height:55%"></span>
+                        <small>Fri</small>
+                    </div>
+
+                    <div class="activity-bar">
+                        <span style="height:90%"></span>
+                        <small>Sat</small>
+                    </div>
+
+                    <div class="activity-bar">
+                        <span style="height:20%"></span>
+                        <small>Sun</small>
+                    </div>
+
+                </div>
+
+            </section>
+
+        </main>
+
+
+        <!-- ================= PROFILE ================= -->
+
+        <main id="profile" class="page">
+
+            <div class="profile-header">
+
+                <div
+                    class="profile-avatar"
+                    id="profileAvatar"
+                >
+                    👤
+                </div>
+
+                <h1 id="profileName">
+                    GYM FIT Member
+                </h1>
+
+                <p id="profileGoalText">
+                    Fitness journey starts here.
+                </p>
+
+            </div>
+
+
+            <div class="profile-menu">
+
+                <div class="profile-item">
+
+                    <span>
+                        🎯
+                    </span>
+
+                    <div>
+
+                        <strong>
+                            Fitness Goal
+                        </strong>
+
+                        <small id="profileGoal">
+                            Build Strength
+                        </small>
+
+                    </div>
+
+                    <span>
+                        ›
+                    </span>
+
+                </div>
+
+
+                <div class="profile-item">
+
+                    <span>
+                        📏
+                    </span>
+
+                    <div>
+
+                        <strong>
+                            Body Stats
+                        </strong>
+
+                        <small id="profileStats">
+                            Height & Weight
+                        </small>
+
+                    </div>
+
+                    <span>
+                        ›
+                    </span>
+
+                </div>
+
+
+                <div class="profile-item">
+
+                    <span>
+                        👤
+                    </span>
+
+                    <div>
+
+                        <strong>
+                            Gender & Age
+                        </strong>
+
+                        <small id="profileGenderAge">
+                            Profile information
+                        </small>
+
+                    </div>
+
+                    <span>
+                        ›
+                    </span>
+
+                </div>
+
+
+                <div class="profile-item">
+
+                    <span>
+                        🏆
+                    </span>
+
+                    <div>
+
+                        <strong>
+                            Achievements
+                        </strong>
+
+                        <small>
+                            View your badges
+                        </small>
+
+                    </div>
+
+                    <span>
+                        ›
+                    </span>
+
+                </div>
+
+
+                <div
+                    class="profile-item logout-item"
+                    onclick="logoutGymFit()"
+                >
+
+                    <span>
+                        🚪
+                    </span>
+
+                    <div>
+
+                        <strong>
+                            Logout
+                        </strong>
+
+                        <small>
+                            Sign out from this device
+                        </small>
+
+                    </div>
+
+                    <span>
+                        ›
+                    </span>
+
+                </div>
+
+            </div>
+
+        </main>
+
+
+        <!-- ================= FOOTER ================= -->
+
+        <footer class="powered-by">
+            Powered by <strong>Aryan</strong>
+        </footer>
+
+
+        <!-- ================= BOTTOM NAV ================= -->
+
+        <nav class="bottom-nav">
+
+            <button
+                class="nav-item active"
+                onclick="showPage('home', this)"
+            >
+                <span>⌂</span>
+                <small>Home</small>
+            </button>
+
+
+            <button
+                class="nav-item"
+                onclick="showPage('workout', this)"
+            >
+                <span>🏋️</span>
+                <small>Workout</small>
+            </button>
+
+
+            <button
+                class="nav-item"
+                onclick="showPage('running', this)"
+            >
+                <span>🏃</span>
+                <small>Run</small>
+            </button>
+
+
+            <button
+                class="nav-item"
+                onclick="showPage('challenge', this)"
+            >
+                <span>🔥</span>
+                <small>Challenge</small>
+            </button>
+
+
+            <button
+                class="nav-item"
+                onclick="showPage('progress', this)"
+            >
+                <span>📊</span>
+                <small>Progress</small>
+            </button>
+
+        </nav>
+
+    </div>
+
+
+    <script src="script fit.js"></script>
+
+</body>
+</html>
