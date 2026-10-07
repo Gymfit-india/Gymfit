@@ -1,154 +1,157 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-:root {
-    --bg: #0b0d10;
-    --card: #15181d;
-    --card-light: #1c2026;
-    --text: #ffffff;
-    --muted: #8d949e;
-    --accent: #b8ff3d;
-    --accent-dark: #8ecb20;
-    --border: #292e35;
-}
-
-html {
-    scroll-behavior: smooth;
-}
-
-body {
-    font-family: Arial, Helvetica, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-}
-
-button {
-    font-family: inherit;
-    cursor: pointer;
-    border: none;
-}
-
-.hidden {
-    display: none !important;
-}
+/* =========================================
+   GYM FIT - COMPLETE JAVASCRIPT
+   Powered by Aryan
+========================================= */
 
 
 /* =========================================================
-   SPLASH SCREEN
+   DATA
 ========================================================= */
 
-.splash-screen {
-    position: fixed;
-    inset: 0;
-    z-index: 99999;
+let completedDays =
+    JSON.parse(
+        localStorage.getItem("gymFitCompletedDays")
+    ) || [];
 
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+let workoutCount =
+    Number(
+        localStorage.getItem("gymFitWorkoutCount")
+    ) || 0;
 
-    background:
-        radial-gradient(
-            circle at center,
-            #20262e 0%,
-            #0b0d10 55%
+let streak =
+    Number(
+        localStorage.getItem("gymFitStreak")
+    ) || 1;
+
+let waterCount =
+    Number(
+        localStorage.getItem("gymFitWater")
+    ) || 0;
+
+let runTimer = null;
+let runSeconds = 0;
+
+
+/* =========================================================
+   LOGIN / PROFILE
+========================================================= */
+
+const isLoggedIn =
+    localStorage.getItem("gymFitLoggedIn") === "true";
+
+const profileComplete =
+    localStorage.getItem("gymFitProfileComplete") === "true";
+
+
+/* =========================================================
+   INITIAL APP START
+========================================================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        createDays();
+
+        updateProgress();
+
+        updateWater();
+
+        updateChallengeUI();
+
+        loadProfileUI();
+
+        initializeEntryFlow();
+
+    }
+);
+
+
+/* =========================================================
+   ENTRY FLOW
+========================================================= */
+
+function initializeEntryFlow() {
+
+    const splash =
+        document.getElementById("splashScreen");
+
+    const auth =
+        document.getElementById("authScreen");
+
+    const profile =
+        document.getElementById("profileSetup");
+
+
+    if (!splash) {
+        return;
+    }
+
+
+    /*
+       New user:
+       Splash -> Login
+    */
+
+    if (!isLoggedIn) {
+
+        setTimeout(
+            function () {
+
+                splash.classList.add("hide");
+
+                if (auth) {
+                    auth.classList.remove("hidden");
+                }
+
+            },
+            1800
         );
 
-    transition:
-        opacity .55s ease,
-        visibility .55s ease;
-}
-
-.splash-screen.hide {
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-}
-
-.splash-logo {
-    display: flex;
-    align-items: baseline;
-
-    font-size: 58px;
-    font-weight: 1000;
-
-    letter-spacing: -5px;
-
-    text-shadow:
-        0 15px 40px rgba(0,0,0,.65);
-
-    animation:
-        splashLogo .8s ease both;
-}
-
-.splash-logo strong {
-    color: var(--accent);
-}
-
-.splash-line {
-    width: 90px;
-    height: 3px;
-
-    margin-top: 18px;
-
-    background: var(--accent);
-
-    border-radius: 20px;
-
-    animation:
-        splashLine 1s ease both;
-}
-
-.splash-screen p {
-    margin-top: 14px;
-
-    color: var(--muted);
-
-    font-size: 10px;
-    font-weight: 900;
-
-    letter-spacing: 3px;
-
-    animation:
-        splashText 1s ease both;
-}
-
-@keyframes splashLogo {
-    from {
-        opacity: 0;
-        transform: scale(.8);
+        return;
     }
 
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
 
-@keyframes splashLine {
-    from {
-        width: 0;
+    /*
+       Logged in but profile incomplete:
+       Splash -> Profile popup
+    */
+
+    if (!profileComplete) {
+
+        setTimeout(
+            function () {
+
+                splash.classList.add("hide");
+
+                if (profile) {
+                    profile.classList.remove("hidden");
+                }
+
+            },
+            1200
+        );
+
+        return;
     }
 
-    to {
-        width: 90px;
-    }
-}
 
-@keyframes splashText {
-    from {
-        opacity: 0;
-        transform: translateY(8px);
-    }
+    /*
+       Already logged in + profile complete:
+       Splash -> Home
+    */
 
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    setTimeout(
+        function () {
+
+            splash.classList.add("hide");
+
+            updateUserName();
+
+        },
+        1000
+    );
+
 }
 
 
@@ -156,1435 +159,1400 @@ button {
    LOGIN
 ========================================================= */
 
-.auth-screen {
-    position: fixed;
-    inset: 0;
+const loginForm =
+    document.getElementById("loginForm");
 
-    z-index: 99990;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+if (loginForm) {
 
-    padding: 20px;
+    loginForm.addEventListener(
+        "submit",
+        function (event) {
 
-    overflow-y: auto;
+            event.preventDefault();
 
-    background:
-        radial-gradient(
-            circle at 50% 10%,
-            rgba(184,255,61,.08),
-            transparent 35%
-        ),
-        var(--bg);
+
+            const name =
+                document
+                    .getElementById("loginName")
+                    .value
+                    .trim();
+
+            const email =
+                document
+                    .getElementById("loginEmail")
+                    .value
+                    .trim();
+
+            const password =
+                document
+                    .getElementById("loginPassword")
+                    .value;
+
+
+            if (!name || !email || !password) {
+
+                alert(
+                    "Please fill all details."
+                );
+
+                return;
+            }
+
+
+            if (password.length < 6) {
+
+                alert(
+                    "Password must be at least 6 characters."
+                );
+
+                return;
+            }
+
+
+            /*
+               Demo/local login.
+               Real authentication can be added later
+               using a backend/Firebase.
+            */
+
+            localStorage.setItem(
+                "gymFitLoggedIn",
+                "true"
+            );
+
+            localStorage.setItem(
+                "gymFitUserName",
+                name
+            );
+
+            localStorage.setItem(
+                "gymFitUserEmail",
+                email
+            );
+
+
+            const auth =
+                document.getElementById("authScreen");
+
+            const profile =
+                document.getElementById("profileSetup");
+
+
+            if (auth) {
+                auth.classList.add("hidden");
+            }
+
+
+            if (profile) {
+                profile.classList.remove("hidden");
+            }
+
+        }
+    );
+
 }
 
-.auth-box {
-    width: min(430px, 100%);
 
-    padding: 35px 28px;
+/* =========================================================
+   GENDER
+========================================================= */
 
-    background:
-        linear-gradient(
-            145deg,
-            #191d23,
-            #101216
+const genderCards =
+    document.querySelectorAll(
+        ".gender-card"
+    );
+
+
+genderCards.forEach(
+    function (card) {
+
+        card.addEventListener(
+            "click",
+            function () {
+
+                genderCards.forEach(
+                    function (item) {
+
+                        item.classList.remove(
+                            "selected"
+                        );
+
+                    }
+                );
+
+
+                card.classList.add(
+                    "selected"
+                );
+
+
+                const gender =
+                    card.getAttribute(
+                        "data-gender"
+                    );
+
+
+                document.getElementById(
+                    "genderInput"
+                ).value = gender;
+
+            }
         );
 
-    border: 1px solid var(--border);
-
-    border-radius: 28px;
-
-    box-shadow:
-        0 30px 90px rgba(0,0,0,.55);
-
-    text-align: center;
-}
-
-.auth-logo {
-    font-size: 35px;
-    font-weight: 1000;
-    letter-spacing: -3px;
-    margin-bottom: 15px;
-}
-
-.auth-logo strong {
-    color: var(--accent);
-}
-
-.auth-badge {
-    display: inline-block;
-
-    padding: 6px 10px;
-
-    border-radius: 20px;
-
-    background: rgba(184,255,61,.08);
-
-    color: var(--accent);
-
-    font-size: 9px;
-    font-weight: 900;
-
-    letter-spacing: 1.3px;
-}
-
-.auth-box h1 {
-    margin-top: 20px;
-
-    font-size: 30px;
-}
-
-.auth-subtitle {
-    margin: 9px 0 27px;
-
-    color: var(--muted);
-
-    line-height: 1.5;
-}
-
-.input-group {
-    text-align: left;
-    margin-bottom: 16px;
-}
-
-.input-group label {
-    display: block;
-
-    margin-bottom: 8px;
-
-    color: #dfe4e9;
-
-    font-size: 12px;
-    font-weight: 800;
-}
-
-.input-group input,
-.number-input input {
-    width: 100%;
-
-    padding: 15px;
-
-    border: 1px solid var(--border);
-
-    border-radius: 13px;
-
-    outline: none;
-
-    background: #0e1115;
-
-    color: white;
-
-    font-size: 15px;
-}
-
-.input-group input:focus,
-.number-input input:focus {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(184,255,61,.06);
-}
-
-.auth-btn {
-    width: 100%;
-
-    margin-top: 7px;
-
-    padding: 16px;
-
-    border-radius: 14px;
-
-    background: var(--accent);
-
-    color: #090b08;
-
-    font-size: 14px;
-    font-weight: 1000;
-
-    transition: .2s;
-}
-
-.auth-btn:hover {
-    transform: translateY(-2px);
-}
-
-.auth-note {
-    margin-top: 18px;
-
-    color: var(--muted);
-
-    font-size: 11px;
-}
+    }
+);
 
 
 /* =========================================================
-   PROFILE POPUP
+   GOAL
 ========================================================= */
 
-.profile-overlay {
-    position: fixed;
-    inset: 0;
+const goalCards =
+    document.querySelectorAll(
+        ".goal-card"
+    );
 
-    z-index: 99995;
 
-    display: flex;
-    justify-content: center;
-    align-items: center;
+goalCards.forEach(
+    function (card) {
 
-    padding: 15px;
+        card.addEventListener(
+            "click",
+            function () {
 
-    background: rgba(0,0,0,.8);
+                goalCards.forEach(
+                    function (item) {
 
-    backdrop-filter: blur(12px);
+                        item.classList.remove(
+                            "selected"
+                        );
 
-    overflow-y: auto;
-}
+                    }
+                );
 
-.profile-popup {
-    width: min(540px, 100%);
-    max-height: 94vh;
 
-    overflow-y: auto;
+                card.classList.add(
+                    "selected"
+                );
 
-    padding: 26px;
 
-    background:
-        linear-gradient(
-            145deg,
-            #191d23,
-            #101216
+                const goal =
+                    card.getAttribute(
+                        "data-goal"
+                    );
+
+
+                document.getElementById(
+                    "goalInput"
+                ).value = goal;
+
+            }
         );
 
-    border: 1px solid #303640;
+    }
+);
 
-    border-radius: 28px;
 
-    box-shadow:
-        0 40px 100px rgba(0,0,0,.7);
-}
+/* =========================================================
+   SAVE PROFILE
+========================================================= */
 
-.setup-header {
-    margin-bottom: 24px;
-}
+const saveProfileBtn =
+    document.getElementById(
+        "saveProfileBtn"
+    );
 
-.setup-small {
-    color: var(--accent);
 
-    font-size: 9px;
-    font-weight: 1000;
+if (saveProfileBtn) {
 
-    letter-spacing: 2px;
-}
+    saveProfileBtn.addEventListener(
+        "click",
+        function () {
 
-.setup-header h2 {
-    margin: 7px 0 6px;
+            const gender =
+                document.getElementById(
+                    "genderInput"
+                ).value;
 
-    font-size: 27px;
-}
+            const age =
+                document.getElementById(
+                    "ageInput"
+                ).value;
 
-.setup-header p {
-    color: var(--muted);
+            const height =
+                document.getElementById(
+                    "heightInput"
+                ).value;
 
-    font-size: 13px;
-}
+            const weight =
+                document.getElementById(
+                    "weightInput"
+                ).value;
 
-.setup-progress {
-    height: 4px;
+            const goal =
+                document.getElementById(
+                    "goalInput"
+                ).value;
 
-    margin-top: 18px;
 
-    background: #292e35;
+            /* ---------- VALIDATION ---------- */
 
-    border-radius: 20px;
+            if (!gender) {
 
-    overflow: hidden;
-}
+                alert(
+                    "Please select your gender."
+                );
 
-.setup-progress span {
-    display: block;
+                return;
+            }
 
-    width: 100%;
-    height: 100%;
 
-    background: var(--accent);
-}
+            if (!age) {
 
-.setup-section {
-    margin-bottom: 22px;
-}
+                alert(
+                    "Please enter your age."
+                );
 
-.setup-section h3 {
-    font-size: 16px;
-    margin-bottom: 4px;
-}
+                return;
+            }
 
-.setup-hint {
-    color: var(--muted);
 
-    font-size: 11px;
+            if (
+                Number(age) < 10 ||
+                Number(age) > 100
+            ) {
 
-    margin-bottom: 12px;
-}
+                alert(
+                    "Please enter a valid age."
+                );
 
-.setup-section > label {
-    display: block;
+                return;
+            }
 
-    margin-bottom: 8px;
 
-    color: #dfe4e9;
+            if (!height) {
 
-    font-size: 13px;
-    font-weight: 800;
+                alert(
+                    "Please enter your height."
+                );
+
+                return;
+            }
+
+
+            if (
+                Number(height) < 100 ||
+                Number(height) > 250
+            ) {
+
+                alert(
+                    "Please enter a valid height."
+                );
+
+                return;
+            }
+
+
+            if (!weight) {
+
+                alert(
+                    "Please enter your weight."
+                );
+
+                return;
+            }
+
+
+            if (
+                Number(weight) < 25 ||
+                Number(weight) > 300
+            ) {
+
+                alert(
+                    "Please enter a valid weight."
+                );
+
+                return;
+            }
+
+
+            if (!goal) {
+
+                alert(
+                    "Please select your fitness goal."
+                );
+
+                return;
+            }
+
+
+            /* ---------- SAVE ---------- */
+
+            localStorage.setItem(
+                "gymFitGender",
+                gender
+            );
+
+            localStorage.setItem(
+                "gymFitAge",
+                age
+            );
+
+            localStorage.setItem(
+                "gymFitHeight",
+                height
+            );
+
+            localStorage.setItem(
+                "gymFitWeight",
+                weight
+            );
+
+            localStorage.setItem(
+                "gymFitGoal",
+                goal
+            );
+
+            localStorage.setItem(
+                "gymFitProfileComplete",
+                "true"
+            );
+
+
+            /* ---------- CLOSE ---------- */
+
+            const profile =
+                document.getElementById(
+                    "profileSetup"
+                );
+
+
+            if (profile) {
+                profile.classList.add(
+                    "hidden"
+                );
+            }
+
+
+            updateProfilePage();
+
+            updateUserName();
+
+
+            const userName =
+                localStorage.getItem(
+                    "gymFitUserName"
+                ) || "Athlete";
+
+
+            alert(
+                "🔥 Welcome to GYM FIT, " +
+                userName +
+                "!"
+            );
+
+        }
+    );
+
 }
 
 
 /* =========================================================
-   GENDER CARDS
+   USER NAME
 ========================================================= */
 
-.gender-options {
-    display: grid;
+function updateUserName() {
 
-    grid-template-columns: 1fr 1fr;
-
-    gap: 12px;
-}
-
-.gender-card {
-    position: relative;
-
-    min-height: 215px;
-
-    padding: 0 10px 15px;
-
-    border: 1px solid var(--border);
-
-    border-radius: 21px;
-
-    background:
-        linear-gradient(
-            145deg,
-            #171b20,
-            #0e1115
+    const name =
+        localStorage.getItem(
+            "gymFitUserName"
         );
 
-    color: white;
 
-    overflow: hidden;
-
-    transition: .25s;
-}
-
-.gender-card:hover {
-    transform: translateY(-3px);
-
-    border-color: #5a626c;
-}
-
-.gender-card.selected {
-    border: 2px solid var(--accent);
-
-    background:
-        radial-gradient(
-            circle at 50% 30%,
-            rgba(184,255,61,.13),
-            transparent 62%
-        ),
-        #111419;
-
-    box-shadow:
-        0 10px 35px rgba(184,255,61,.08);
-}
-
-.gender-card > strong {
-    display: block;
-
-    margin-top: 3px;
-
-    font-size: 16px;
-}
-
-.gender-card > small {
-    display: block;
-
-    margin-top: 4px;
-
-    color: var(--muted);
-
-    font-size: 10px;
-}
-
-
-/* =========================================================
-   3D-STYLE FITNESS CHARACTERS
-========================================================= */
-
-.gender-visual {
-    position: relative;
-
-    width: 145px;
-    height: 155px;
-
-    margin: 5px auto 0;
-
-    transform:
-        perspective(500px)
-        rotateY(-7deg);
-}
-
-.character-shadow {
-    position: absolute;
-
-    bottom: 5px;
-    left: 25px;
-
-    width: 95px;
-    height: 15px;
-
-    background: rgba(0,0,0,.5);
-
-    border-radius: 50%;
-
-    filter: blur(5px);
-}
-
-.character-head {
-    position: absolute;
-
-    top: 3px;
-    left: 50%;
-
-    width: 52px;
-    height: 52px;
-
-    transform: translateX(-50%);
-
-    display: grid;
-    place-items: center;
-
-    border-radius: 50%;
-
-    background:
-        linear-gradient(
-            145deg,
-            #ffe0c2,
-            #b96e43
+    const hello =
+        document.getElementById(
+            "helloText"
         );
 
-    box-shadow:
-        5px 8px 15px rgba(0,0,0,.45);
 
-    z-index: 3;
-}
+    if (hello && name) {
 
-.character-head span {
-    font-size: 38px;
+        hello.innerText =
+            "Welcome back, " +
+            name +
+            " 💪";
 
-    filter:
-        drop-shadow(
-            2px 5px 4px rgba(0,0,0,.3)
-        );
-}
+    }
 
-.character-body {
-    position: absolute;
 
-    top: 48px;
-    left: 50%;
-
-    transform: translateX(-50%);
-
-    width: 59px;
-    height: 68px;
-
-    border-radius: 23px 23px 13px 13px;
-
-    box-shadow:
-        inset 7px 0 8px rgba(255,255,255,.08),
-        8px 12px 18px rgba(0,0,0,.5);
-
-    z-index: 2;
-}
-
-.male-body {
-    background:
-        linear-gradient(
-            90deg,
-            #202730,
-            #687584,
-            #151a20
+    const profileName =
+        document.getElementById(
+            "profileName"
         );
 
-    width: 67px;
+
+    if (profileName && name) {
+
+        profileName.innerText =
+            name;
+
+    }
+
 }
 
-.female-body {
-    background:
-        linear-gradient(
-            90deg,
-            #472d43,
-            #a56a8d,
-            #382532
+
+/* =========================================================
+   PROFILE UI
+========================================================= */
+
+function loadProfileUI() {
+
+    updateProfilePage();
+
+    updateUserName();
+
+}
+
+
+function updateProfilePage() {
+
+    const gender =
+        localStorage.getItem(
+            "gymFitGender"
         );
 
-    width: 58px;
-}
-
-.character-body i {
-    position: absolute;
-
-    top: 9px;
-    left: 50%;
-
-    width: 3px;
-    height: 45px;
-
-    transform: translateX(-50%);
-
-    background: rgba(255,255,255,.14);
-
-    border-radius: 10px;
-}
-
-.character-arm {
-    position: absolute;
-
-    top: 55px;
-
-    width: 16px;
-    height: 64px;
-
-    border-radius: 12px;
-
-    background:
-        linear-gradient(
-            90deg,
-            #2b323b,
-            #727c88
+    const age =
+        localStorage.getItem(
+            "gymFitAge"
         );
 
-    box-shadow:
-        5px 7px 10px rgba(0,0,0,.4);
-
-    z-index: 1;
-}
-
-.character-arm.arm-left {
-    left: 27px;
-
-    transform: rotate(13deg);
-}
-
-.character-arm.arm-right {
-    right: 27px;
-
-    transform: rotate(-13deg);
-}
-
-.female-visual .character-arm {
-    background:
-        linear-gradient(
-            90deg,
-            #593a50,
-            #a77496
-        );
-}
-
-.character-leg {
-    position: absolute;
-
-    top: 108px;
-
-    width: 19px;
-    height: 45px;
-
-    border-radius: 8px;
-
-    background:
-        linear-gradient(
-            90deg,
-            #1c2229,
-            #59636e
+    const height =
+        localStorage.getItem(
+            "gymFitHeight"
         );
 
-    box-shadow:
-        4px 7px 10px rgba(0,0,0,.4);
-
-    z-index: 0;
-}
-
-.character-leg.leg-left {
-    left: 52px;
-    transform: rotate(3deg);
-}
-
-.character-leg.leg-right {
-    right: 52px;
-    transform: rotate(-3deg);
-}
-
-.female-visual .character-leg {
-    background:
-        linear-gradient(
-            90deg,
-            #35232f,
-            #76506b
-        );
-}
-
-
-/* =========================================================
-   NUMBER INPUT
-========================================================= */
-
-.number-input {
-    position: relative;
-}
-
-.number-input input {
-    padding-right: 65px;
-}
-
-.number-input span {
-    position: absolute;
-
-    top: 50%;
-    right: 15px;
-
-    transform: translateY(-50%);
-
-    color: var(--muted);
-
-    font-size: 12px;
-    font-weight: 800;
-}
-
-
-/* =========================================================
-   GOALS
-========================================================= */
-
-.goal-options {
-    display: grid;
-
-    grid-template-columns: 1fr 1fr;
-
-    gap: 10px;
-}
-
-.goal-card {
-    display: flex;
-    align-items: center;
-
-    gap: 10px;
-
-    padding: 14px;
-
-    border: 1px solid var(--border);
-
-    border-radius: 14px;
-
-    background: #111419;
-
-    color: white;
-
-    text-align: left;
-
-    transition: .2s;
-}
-
-.goal-card span {
-    font-size: 21px;
-}
-
-.goal-card strong {
-    font-size: 12px;
-}
-
-.goal-card.selected {
-    border-color: var(--accent);
-
-    background:
-        rgba(184,255,61,.09);
-}
-
-.continue-profile-btn {
-    width: 100%;
-
-    padding: 16px;
-
-    margin-top: 2px;
-
-    border-radius: 14px;
-
-    background: var(--accent);
-
-    color: #090b08;
-
-    font-weight: 1000;
-
-    transition: .2s;
-}
-
-.continue-profile-btn:hover {
-    transform: translateY(-2px);
-}
-
-
-/* =========================================================
-   APP
-========================================================= */
-
-.app {
-    width: 100%;
-    max-width: 1100px;
-    margin: auto;
-    min-height: 100vh;
-    padding-bottom: 90px;
-}
-
-.topbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 22px 20px;
-}
-
-.brand {
-    font-size: 28px;
-    font-weight: 900;
-    letter-spacing: -1px;
-}
-
-.brand span {
-    color: var(--accent);
-}
-
-.hello {
-    color: var(--muted);
-    font-size: 13px;
-    margin-top: 5px;
-}
-
-.profile-btn {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    background: var(--card-light);
-    border: 1px solid var(--border);
-    font-size: 20px;
-}
-
-.page {
-    display: none;
-    padding: 0 20px 25px;
-}
-
-.page.active {
-    display: block;
-}
-
-.page-title {
-    padding: 20px 0;
-}
-
-.page-title span {
-    color: var(--accent);
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: 2px;
-}
-
-.page-title h1 {
-    font-size: 38px;
-    margin: 7px 0;
-}
-
-.page-title p {
-    color: var(--muted);
-}
-
-
-/* =========================================================
-   HERO
-========================================================= */
-
-.hero-card {
-    background:
-        linear-gradient(
-            135deg,
-            #1d2428,
-            #111419
+    const weight =
+        localStorage.getItem(
+            "gymFitWeight"
         );
 
-    border: 1px solid var(--border);
-
-    border-radius: 25px;
-
-    padding: 30px;
-
-    min-height: 310px;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
-
-    overflow: hidden;
-}
-
-.hero-text {
-    max-width: 560px;
-}
-
-.small-title {
-    color: var(--accent);
-
-    font-size: 11px;
-    font-weight: 800;
-
-    letter-spacing: 2px;
-
-    margin-bottom: 14px;
-}
-
-.hero-text h1 {
-    font-size: clamp(38px, 7vw, 70px);
-
-    line-height: .95;
-
-    letter-spacing: -3px;
-
-    margin-bottom: 18px;
-}
-
-.hero-text > p:not(.small-title) {
-    color: var(--muted);
-
-    line-height: 1.6;
-
-    max-width: 450px;
-
-    margin-bottom: 25px;
-}
-
-.hero-icon {
-    font-size: 110px;
-
-    transform: rotate(-8deg);
-
-    opacity: .9;
-}
-
-
-/* =========================================================
-   BUTTONS
-========================================================= */
-
-.primary-btn {
-    background: var(--accent);
-
-    color: #0a0d08;
-
-    padding: 14px 21px;
-
-    border-radius: 12px;
-
-    font-weight: 900;
-
-    transition: .2s;
-}
-
-.primary-btn:hover {
-    transform: translateY(-2px);
-
-    background: #caff70;
-}
-
-.secondary-btn {
-    background: transparent;
-
-    border: 1px solid var(--accent);
-
-    color: var(--accent);
-
-    padding: 12px 17px;
-
-    border-radius: 10px;
-
-    font-weight: 800;
-
-    margin-top: 15px;
-}
-
-.complete-btn {
-    width: 100%;
-
-    background: var(--accent);
-
-    color: #090b08;
-
-    padding: 17px;
-
-    border-radius: 13px;
-
-    font-weight: 900;
-
-    font-size: 15px;
-
-    margin-top: 20px;
-}
-
-
-/* =========================================================
-   STATS
-========================================================= */
-
-.stats-grid {
-    display: grid;
-
-    grid-template-columns: repeat(3, 1fr);
-
-    gap: 14px;
-
-    margin: 20px 0;
-}
-
-.stat-card {
-    background: var(--card);
-
-    border: 1px solid var(--border);
-
-    border-radius: 17px;
-
-    padding: 20px;
-
-    text-align: center;
-}
-
-.stat-icon {
-    font-size: 25px;
-
-    margin-bottom: 8px;
-}
-
-.stat-card h2 {
-    font-size: 24px;
-}
-
-.stat-card p {
-    color: var(--muted);
-
-    font-size: 12px;
-
-    margin-top: 5px;
-}
-
-.water-card {
-    cursor: pointer;
-}
-
-
-/* =========================================================
-   SECTION
-========================================================= */
-
-.section {
-    margin-top: 28px;
-}
-
-.section-heading {
-    display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
-
-    margin-bottom: 14px;
-}
-
-.section-heading h2 {
-    font-size: 21px;
-}
-
-.section-heading span {
-    color: var(--accent);
-
-    font-size: 12px;
-}
-
-
-/* =========================================================
-   WORKOUT CARD
-========================================================= */
-
-.workout-card {
-    display: flex;
-
-    align-items: center;
-
-    gap: 15px;
-
-    background: var(--card);
-
-    border: 1px solid var(--border);
-
-    border-radius: 17px;
-
-    padding: 13px;
-
-    margin-bottom: 12px;
-
-    cursor: pointer;
-
-    transition: .2s;
-}
-
-.workout-card:hover {
-    transform: translateY(-2px);
-
-    border-color: var(--accent-dark);
-}
-
-.workout-image {
-    min-width: 70px;
-
-    height: 70px;
-
-    border-radius: 13px;
-
-    background: var(--card-light);
-
-    display: grid;
-
-    place-items: center;
-
-    font-size: 34px;
-}
-
-.workout-info {
-    flex: 1;
-}
-
-.workout-info h3 {
-    margin: 6px 0;
-}
-
-.workout-info p {
-    color: var(--muted);
-
-    font-size: 12px;
-}
-
-.tag,
-.challenge-label {
-    color: var(--accent);
-
-    font-size: 9px;
-
-    font-weight: 900;
-
-    letter-spacing: 1.3px;
-}
-
-.running-tag {
-    color: #66b8ff;
-}
-
-.mini-progress {
-    height: 4px;
-
-    background: #292e35;
-
-    border-radius: 10px;
-
-    margin-top: 10px;
-
-    overflow: hidden;
-}
-
-.mini-progress div {
-    height: 100%;
-
-    width: 35%;
-
-    background: var(--accent);
-}
-
-.arrow {
-    color: var(--accent);
-
-    font-size: 22px;
-}
-
-
-/* =========================================================
-   CHALLENGE CARD
-========================================================= */
-
-.challenge-card {
-    margin-top: 25px;
-
-    padding: 25px;
-
-    background:
-        linear-gradient(
-            135deg,
-            #1a2117,
-            #121612
+    const goal =
+        localStorage.getItem(
+            "gymFitGoal"
         );
 
-    border: 1px solid #39442d;
 
-    border-radius: 20px;
-
-    display: flex;
-
-    justify-content: space-between;
-
-    align-items: center;
-}
-
-.challenge-card h2 {
-    margin: 8px 0;
-}
-
-.challenge-card p {
-    color: var(--muted);
-
-    font-size: 13px;
-
-    max-width: 520px;
-
-    line-height: 1.5;
-}
-
-.challenge-number {
-    display: flex;
-
-    align-items: baseline;
-
-    white-space: nowrap;
-}
-
-.challenge-number strong {
-    color: var(--accent);
-
-    font-size: 55px;
-}
-
-.challenge-number span {
-    color: var(--muted);
-}
+    const profileGoal =
+        document.getElementById(
+            "profileGoal"
+        );
 
 
-/* =========================================================
-   LEVEL
-========================================================= */
+    if (profileGoal && goal) {
+        profileGoal.innerText = goal;
+    }
 
-.level-grid {
-    display: grid;
 
-    grid-template-columns: repeat(3, 1fr);
+    const profileStats =
+        document.getElementById(
+            "profileStats"
+        );
 
-    gap: 14px;
-}
 
-.level-card {
-    background: var(--card);
+    if (
+        profileStats &&
+        height &&
+        weight
+    ) {
 
-    border: 1px solid var(--border);
+        profileStats.innerText =
+            height +
+            " cm • " +
+            weight +
+            " kg";
 
-    border-radius: 18px;
+    }
 
-    padding: 25px 18px;
 
-    cursor: pointer;
+    const genderAge =
+        document.getElementById(
+            "profileGenderAge"
+        );
 
-    transition: .2s;
-}
 
-.level-card:hover {
-    border-color: var(--accent);
+    if (
+        genderAge &&
+        gender &&
+        age
+    ) {
 
-    transform: translateY(-3px);
-}
+        genderAge.innerText =
+            gender +
+            " • " +
+            age +
+            " years";
 
-.level-card span {
-    font-size: 30px;
-}
+    }
 
-.level-card h3 {
-    margin-top: 14px;
-}
 
-.level-card p {
-    color: var(--muted);
+    const goalText =
+        document.getElementById(
+            "profileGoalText"
+        );
 
-    font-size: 12px;
 
-    margin-top: 6px;
+    if (goalText && goal) {
+
+        goalText.innerText =
+            goal +
+            " • Keep pushing forward.";
+
+    }
+
+
+    const avatar =
+        document.getElementById(
+            "profileAvatar"
+        );
+
+
+    if (avatar && gender) {
+
+        avatar.innerText =
+            gender === "Female"
+                ? "👩"
+                : "👨";
+
+    }
+
 }
 
 
 /* =========================================================
-   EXERCISES
+   LOGOUT
 ========================================================= */
 
-.exercise {
-    display: flex;
+function logoutGymFit() {
 
-    align-items: center;
+    const confirmLogout =
+        confirm(
+            "Logout from GYM FIT?"
+        );
 
-    gap: 14px;
 
-    background: var(--card);
+    if (!confirmLogout) {
+        return;
+    }
 
-    border: 1px solid var(--border);
 
-    border-radius: 15px;
+    localStorage.removeItem(
+        "gymFitLoggedIn"
+    );
 
-    padding: 14px;
+    localStorage.removeItem(
+        "gymFitUserName"
+    );
 
-    margin-bottom: 10px;
-}
+    localStorage.removeItem(
+        "gymFitUserEmail"
+    );
 
-.exercise-icon {
-    width: 50px;
-    height: 50px;
+    localStorage.removeItem(
+        "gymFitProfileComplete"
+    );
 
-    background: var(--card-light);
+    localStorage.removeItem(
+        "gymFitGender"
+    );
 
-    display: grid;
+    localStorage.removeItem(
+        "gymFitAge"
+    );
 
-    place-items: center;
+    localStorage.removeItem(
+        "gymFitHeight"
+    );
 
-    border-radius: 12px;
+    localStorage.removeItem(
+        "gymFitWeight"
+    );
 
-    font-size: 23px;
-}
+    localStorage.removeItem(
+        "gymFitGoal"
+    );
 
-.exercise div:nth-child(2) {
-    flex: 1;
-}
 
-.exercise h3 {
-    font-size: 15px;
-}
+    location.reload();
 
-.exercise p {
-    color: var(--muted);
-
-    font-size: 12px;
-
-    margin-top: 4px;
-}
-
-.exercise > span {
-    color: var(--accent);
 }
 
 
 /* =========================================================
-   RUN
+   PAGE NAVIGATION
 ========================================================= */
 
-.run-card {
-    text-align: center;
+function showPage(
+    pageId,
+    button = null
+) {
 
-    background: var(--card);
+    const pages =
+        document.querySelectorAll(
+            ".page"
+        );
 
-    border: 1px solid var(--border);
 
-    border-radius: 25px;
+    pages.forEach(
+        function (page) {
 
-    padding: 35px 20px;
-}
+            page.classList.remove(
+                "active"
+            );
 
-.run-circle {
-    width: 170px;
-    height: 170px;
+        }
+    );
 
-    border: 9px solid var(--accent);
 
-    border-radius: 50%;
+    const selectedPage =
+        document.getElementById(
+            pageId
+        );
 
-    margin: 0 auto 25px;
 
-    display: flex;
+    if (selectedPage) {
 
-    flex-direction: column;
+        selectedPage.classList.add(
+            "active"
+        );
 
-    justify-content: center;
+    }
 
-    align-items: center;
-}
 
-.run-circle strong {
-    font-size: 45px;
-}
+    const navButtons =
+        document.querySelectorAll(
+            ".nav-item"
+        );
 
-.run-circle span {
-    color: var(--muted);
-}
 
-.run-card h2 {
-    margin-bottom: 7px;
-}
+    navButtons.forEach(
+        function (btn) {
 
-.run-card p {
-    color: var(--muted);
+            btn.classList.remove(
+                "active"
+            );
 
-    margin-bottom: 20px;
+        }
+    );
+
+
+    if (button) {
+
+        button.classList.add(
+            "active"
+        );
+
+    } else {
+
+        navButtons.forEach(
+            function (btn) {
+
+                const text =
+                    btn.innerText
+                        .toLowerCase();
+
+
+                if (
+                    (pageId === "home" &&
+                        text.includes("home")) ||
+
+                    (pageId === "workout" &&
+                        text.includes("workout")) ||
+
+                    (pageId === "running" &&
+                        text.includes("run")) ||
+
+                    (pageId === "challenge" &&
+                        text.includes("challenge")) ||
+
+                    (pageId === "progress" &&
+                        text.includes("progress"))
+                ) {
+
+                    btn.classList.add(
+                        "active"
+                    );
+
+                }
+
+            }
+        );
+
+    }
+
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+
+
+    updateProgress();
+
+    updateChallengeUI();
+
 }
 
 
 /* =========================================================
-   CHALLENGE
+   WORKOUT LEVEL
 ========================================================= */
 
-.challenge-progress {
-    background: var(--card);
+function selectLevel(level) {
 
-    border: 1px solid var(--border);
+    localStorage.setItem(
+        "gymFitLevel",
+        level
+    );
 
-    padding: 18px;
 
-    border-radius: 15px;
+    alert(
+        "💪 " +
+        level +
+        " level selected!\n\n" +
+        "Your workout plan is ready."
+    );
+
 }
 
-.progress-header {
-    display: flex;
 
-    justify-content: space-between;
+/* =========================================================
+   COMPLETE WORKOUT
+========================================================= */
 
-    margin-bottom: 10px;
+function completeWorkout() {
+
+    workoutCount++;
+
+
+    localStorage.setItem(
+        "gymFitWorkoutCount",
+        workoutCount
+    );
+
+
+    updateProgress();
+
+
+    alert(
+        "🔥 Workout Completed!\n\n" +
+        "Great job! Keep going."
+    );
+
 }
 
-.progress-header strong {
-    color: var(--accent);
+
+/* =========================================================
+   RUNNING
+========================================================= */
+
+function startRun() {
+
+    if (runTimer) {
+
+        return;
+
+    }
+
+
+    runSeconds = 0;
+
+
+    const button =
+        document.getElementById(
+            "runButton"
+        );
+
+
+    if (button) {
+
+        button.innerText =
+            "RUNNING...";
+
+    }
+
+
+    runTimer =
+        setInterval(
+            function () {
+
+                runSeconds++;
+
+
+                const minutes =
+                    Math.floor(
+                        runSeconds / 60
+                    );
+
+
+                const seconds =
+                    runSeconds % 60;
+
+
+                const timeText =
+                    String(minutes)
+                        .padStart(2, "0") +
+                    ":" +
+                    String(seconds)
+                        .padStart(2, "0");
+
+
+                const time =
+                    document.getElementById(
+                        "runTime"
+                    );
+
+
+                if (time) {
+
+                    time.innerText =
+                        timeText;
+
+                }
+
+
+                const pace =
+                    document.getElementById(
+                        "runPace"
+                    );
+
+
+                if (pace) {
+
+                    const paceMinutes =
+                        Math.floor(
+                            runSeconds / 96
+                        );
+
+                    const paceSeconds =
+                        Math.floor(
+                            runSeconds % 96
+                        );
+
+
+                    pace.innerText =
+                        String(paceMinutes)
+                            .padStart(2, "0") +
+                        ":" +
+                        String(paceSeconds)
+                            .padStart(2, "0");
+
+                }
+
+            },
+            1000
+        );
+
+
+    alert(
+        "🏃 Run started!\n\n" +
+        "Target: 1.6 KM"
+    );
+
 }
 
-.progress-bar {
-    height: 9px;
 
-    background: #292e35;
+/* =========================================================
+   CREATE 30 DAYS
+========================================================= */
 
-    border-radius: 20px;
+function createDays() {
 
-    overflow: hidden;
+    const grid =
+        document.getElementById(
+            "dayGrid"
+        );
+
+
+    if (!grid) {
+
+        return;
+
+    }
+
+
+    grid.innerHTML = "";
+
+
+    for (
+        let day = 1;
+        day <= 30;
+        day++
+    ) {
+
+        const dayBox =
+            document.createElement(
+                "div"
+            );
+
+
+        dayBox.className =
+            "day";
+
+
+        dayBox.innerText =
+            day;
+
+
+        if (
+            completedDays.includes(day)
+        ) {
+
+            dayBox.classList.add(
+                "completed"
+            );
+
+            dayBox.innerText =
+                "✓ " + day;
+
+        }
+
+
+        if (
+            day > 1 &&
+            !completedDays.includes(
+                day - 1
+            ) &&
+            !completedDays.includes(day)
+        ) {
+
+            dayBox.classList.add(
+                "locked"
+            );
+
+            dayBox.innerText =
+                "🔒 " + day;
+
+        }
+
+
+        dayBox.addEventListener(
+            "click",
+            function () {
+
+                if (
+                    day > 1 &&
+                    !completedDays.includes(
+                        day - 1
+                    )
+                ) {
+
+                    alert(
+                        "🔒 Day " +
+                        day +
+                        " is locked.\n\n" +
+                        "Complete Day " +
+                        (day - 1) +
+                        " first."
+                    );
+
+                    return;
+
+                }
+
+
+                if (
+                    completedDays.includes(day)
+                ) {
+
+                    alert(
+                        "✅ Day " +
+                        day +
+                        " is already completed!"
+                    );
+
+                    return;
+
+                }
+
+
+                showDayDetails(day);
+
+            }
+        );
+
+
+        grid.appendChild(dayBox);
+
+    }
+
 }
 
-.progress-bar div {
-    height: 100%;
 
-    width: 0%;
+/* =========================================================
+   DAY DETAILS
+========================================================= */
 
-    background: var(--accent);
+function showDayDetails(day) {
 
-    transition: .4s;
+    alert(
+        "🔥 DAY " +
+        day +
+        " CHALLENGE\n\n" +
+
+        "🏃 Run: 1.6 KM\n" +
+
+        "💪 Push Ups: " +
+        getPushups(day) +
+        "\n" +
+
+        "🦵 Squats: " +
+        getSquats(day) +
+        "\n" +
+
+        "🏋️ Pull Ups: " +
+        getPullups(day) +
+        "\n\n" +
+
+        "Complete all exercises,\n" +
+        "then press COMPLETE DAY."
+    );
+
 }
 
-.day-grid {
-    display: grid;
 
-    grid-template-columns: repeat(6, 1fr);
+/* =========================================================
+   CHALLENGE REP CALCULATOR
+========================================================= */
 
-    gap: 8px;
+function getPushups(day) {
 
-    margin-top: 18px;
+    if (day === 1) {
+        return 20;
+    }
+
+    if (day === 2) {
+        return 35;
+    }
+
+    if (day === 3) {
+        return 50;
+    }
+
+    return 50 + (
+        (day - 3) * 5
+    );
+
 }
 
-.day {
-    min-height: 55px;
 
-    border: 1px solid var(--border);
+function getSquats(day) {
 
-    background: var(--card);
+    if (day === 1) {
+        return 20;
+    }
 
-    border-radius: 10px;
+    if (day === 2) {
+        return 35;
+    }
 
-    display: grid;
+    if (day === 3) {
+        return 50;
+    }
 
-    place-items: center;
+    return 50 + (
+        (day - 3) * 5
+    );
 
-    cursor: pointer;
-
-    font-weight: 800;
 }
 
-.day.completed {
-    background: var(--accent);
 
-    color: #090b08;
+function getPullups(day) {
+
+    if (day === 1) {
+        return 5;
+    }
+
+    if (day === 2) {
+        return 8;
+    }
+
+    if (day === 3) {
+        return 10;
+    }
+
+    return 10 + Math.floor(
+        (day - 3) / 2
+    );
+
 }
 
-.day.locked {
-    opacity: .45;
 
-    cursor: not-allowed;
+/* =========================================================
+   UPDATE CHALLENGE UI
+========================================================= */
+
+function updateChallengeUI() {
+
+    let nextDay = 1;
+
+
+    while (
+        completedDays.includes(nextDay) &&
+        nextDay <= 30
+    ) {
+
+        nextDay++;
+
+    }
+
+
+    if (nextDay > 30) {
+
+        nextDay = 30;
+
+    }
+
+
+    const title =
+        document.getElementById(
+            "challengeDayTitle"
+        );
+
+
+    if (title) {
+
+        title.innerText =
+            "Day " + nextDay;
+
+    }
+
+
+    const pushups =
+        document.getElementById(
+            "challengePushups"
+        );
+
+
+    if (pushups) {
+
+        pushups.innerText =
+            getPushups(nextDay);
+
+    }
+
+
+    const squats =
+        document.getElementById(
+            "challengeSquats"
+        );
+
+
+    if (squats) {
+
+        squats.innerText =
+            getSquats(nextDay);
+
+    }
+
+
+    const pullups =
+        document.getElementById(
+            "challengePullups"
+        );
+
+
+    if (pullups) {
+
+        pullups.innerText =
+            getPullups(nextDay);
+
+    }
+
+
+    const completeButton =
+        document.getElementById(
+            "completeChallengeBtn"
+        );
+
+
+    if (completeButton) {
+
+        if (completedDays.length >= 30) {
+
+            completeButton.innerText =
+                "🏆 30 DAYS COMPLETED";
+
+            completeButton.disabled =
+                true;
+
+        } else {
+
+            completeButton.innerText =
+                "✓ COMPLETE DAY " +
+                nextDay;
+
+            completeButton.disabled =
+                false;
+
+        }
+
+    }
+
+
+    const homeDay =
+        document.getElementById(
+            "homeChallengeDay"
+        );
+
+
+    if (homeDay) {
+
+        homeDay.innerText =
+            String(nextDay)
+                .padStart(2, "0");
+
+    }
+
 }
 
-.daily-challenge {
-    margin-top: 20px;
 
-    padding: 22px;
+/* =========================================================
+   COMPLETE CHALLENGE
+========================================================= */
 
-    background: var(--card);
+function completeChallenge() {
 
-    border: 1px solid var(--border);
+    let nextDay = 1;
 
-    border-radius: 18px;
-}
 
-.daily-challenge > span {
-    color: var(--accent);
+    while (
+        completedDays.includes(nextDay) &&
+        nextDay <= 30
+    ) {
 
-    font-size: 10px;
+        nextDay++;
 
-    font-weight: 900;
+    }
 
-    letter-spacing: 1.5px;
-}
 
-.daily-challenge h2 {
-    margin: 8px 0 20px;
-}
+    if (nextDay > 30) {
 
-.challenge-exercises {
-    display: grid;
+        alert(
+            "🏆 Congratulations!\n\n" +
+            "You completed all 30 days!"
+        );
 
-    grid-template-columns: repeat(4, 1fr);
+        return;
 
-    gap: 10px;
-}
+    }
 
-.challenge-exercises div {
-    background: var(--card-light);
 
-    padding: 15px 8px;
+    if (nextDay > 1) {
 
-    border-radius: 12px;
+        const previous =
+            nextDay - 1;
 
-    text-align: center;
-}
 
-.challenge-exercises strong {
-    display: block;
+        if (
+            !completedDays.includes(
+                previous
+            )
+        ) {
 
-    font-size: 20px;
+            alert(
+                "🔒 Complete Day " +
+                previous +
+                " first."
+            );
 
-    color: var(--accent);
-}
+            return;
 
-.challenge-exercises span {
-    display: block;
+        }
 
-    color: var(--muted);
+    }
 
-    font-size: 10px;
 
-    margin-top: 5px;
+    const confirmComplete =
+        confirm(
+            "Complete Day " +
+            nextDay +
+            "?\n\n" +
+
+            "🏃 1.6 KM Run\n" +
+
+            "💪 Push Ups: " +
+            getPushups(nextDay) +
+            "\n" +
+
+            "🦵 Squats: " +
+            getSquats(nextDay) +
+            "\n" +
+
+            "🏋️ Pull Ups: " +
+            getPullups(nextDay)
+        );
+
+
+    if (!confirmComplete) {
+
+        return;
+
+    }
+
+
+    completedDays.push(
+        nextDay
+    );
+
+
+    localStorage.setItem(
+        "gymFitCompletedDays",
+        JSON.stringify(
+            completedDays
+        )
+    );
+
+
+    streak =
+        completedDays.length || 1;
+
+
+    localStorage.setItem(
+        "gymFitStreak",
+        streak
+    );
+
+
+    createDays();
+
+    updateProgress();
+
+    updateChallengeUI();
+
+
+    if (nextDay < 30) {
+
+        alert(
+            "🔥 DAY " +
+            nextDay +
+            " COMPLETED!\n\n" +
+
+            "Day " +
+            (nextDay + 1) +
+            " is now unlocked."
+        );
+
+    } else {
+
+        alert(
+            "🏆 AMAZING!\n\n" +
+            "You completed the entire " +
+            "30 Day Challenge!"
+        );
+
+    }
+
 }
 
 
@@ -1592,401 +1560,178 @@ button {
    PROGRESS
 ========================================================= */
 
-.big-progress {
-    display: flex;
+function updateProgress() {
 
-    justify-content: center;
+    const completed =
+        completedDays.length;
 
-    padding: 25px 0;
-}
 
-.progress-circle {
-    width: 190px;
-    height: 190px;
+    const percentage =
+        Math.round(
+            (completed / 30) * 100
+        );
 
-    border-radius: 50%;
 
-    border: 12px solid var(--card-light);
+    const percent =
+        document.getElementById(
+            "progressPercent"
+        );
 
-    outline: 2px solid var(--accent);
 
-    display: flex;
+    if (percent) {
 
-    flex-direction: column;
+        percent.innerText =
+            percentage + "%";
 
-    align-items: center;
+    }
 
-    justify-content: center;
-}
 
-.progress-circle strong {
-    font-size: 42px;
+    const bar =
+        document.getElementById(
+            "progressBar"
+        );
 
-    color: var(--accent);
-}
 
-.progress-circle span {
-    color: var(--muted);
+    if (bar) {
 
-    font-size: 12px;
-}
+        bar.style.width =
+            percentage + "%";
 
-.activity-card {
-    background: var(--card);
+    }
 
-    border: 1px solid var(--border);
 
-    border-radius: 18px;
+    const big =
+        document.getElementById(
+            "bigProgress"
+        );
 
-    height: 220px;
 
-    padding: 20px;
+    if (big) {
 
-    display: flex;
+        big.innerText =
+            percentage + "%";
 
-    align-items: flex-end;
+    }
 
-    justify-content: space-around;
 
-    gap: 10px;
-}
+    const workout =
+        document.getElementById(
+            "workoutCount"
+        );
 
-.activity-bar {
-    height: 160px;
 
-    flex: 1;
+    if (workout) {
 
-    display: flex;
+        workout.innerText =
+            workoutCount;
 
-    flex-direction: column;
+    }
 
-    justify-content: flex-end;
 
-    align-items: center;
+    const days =
+        document.getElementById(
+            "dayCount"
+        );
 
-    gap: 8px;
-}
 
-.activity-bar span {
-    display: block;
+    if (days) {
 
-    width: 100%;
+        days.innerText =
+            completed;
 
-    max-width: 35px;
+    }
 
-    background: var(--accent);
 
-    border-radius: 7px 7px 2px 2px;
-}
+    const streakHome =
+        document.getElementById(
+            "streak"
+        );
 
-.activity-bar small {
-    color: var(--muted);
 
-    font-size: 9px;
+    if (streakHome) {
+
+        streakHome.innerText =
+            streak;
+
+    }
+
+
+    const progressStreak =
+        document.getElementById(
+            "progressStreak"
+        );
+
+
+    if (progressStreak) {
+
+        progressStreak.innerText =
+            streak;
+
+    }
+
 }
 
 
 /* =========================================================
-   PROFILE
+   WATER
 ========================================================= */
 
-.profile-header {
-    text-align: center;
+function addWater() {
 
-    padding: 25px 0;
+    waterCount++;
+
+
+    localStorage.setItem(
+        "gymFitWater",
+        waterCount
+    );
+
+
+    updateWater();
+
 }
 
-.profile-avatar {
-    width: 90px;
-    height: 90px;
 
-    background: var(--card-light);
+function updateWater() {
 
-    border: 2px solid var(--accent);
+    const water =
+        document.getElementById(
+            "water"
+        );
 
-    border-radius: 50%;
 
-    display: grid;
+    if (water) {
 
-    place-items: center;
+        water.innerText =
+            waterCount;
 
-    font-size: 40px;
+    }
 
-    margin: 0 auto 15px;
-}
-
-.profile-header h1 {
-    font-size: 23px;
-}
-
-.profile-header p {
-    color: var(--muted);
-
-    margin-top: 5px;
-}
-
-.profile-menu {
-    margin-top: 20px;
-}
-
-.profile-item {
-    display: flex;
-
-    align-items: center;
-
-    gap: 15px;
-
-    padding: 17px;
-
-    background: var(--card);
-
-    border: 1px solid var(--border);
-
-    margin-bottom: 9px;
-
-    border-radius: 14px;
-}
-
-.profile-item > span:first-child {
-    font-size: 22px;
-}
-
-.profile-item div {
-    flex: 1;
-}
-
-.profile-item strong,
-.profile-item small {
-    display: block;
-}
-
-.profile-item small {
-    color: var(--muted);
-
-    font-size: 11px;
-
-    margin-top: 4px;
-}
-
-.logout-item {
-    cursor: pointer;
-}
-
-.logout-item:hover {
-    border-color: #777;
 }
 
 
 /* =========================================================
-   FOOTER
+   WATER CLICK
 ========================================================= */
 
-.powered-by {
-    text-align: center;
+document.addEventListener(
+    "click",
+    function (event) {
 
-    padding: 25px 10px 100px;
-
-    color: var(--muted);
-
-    font-size: 13px;
-
-    letter-spacing: .5px;
-}
-
-.powered-by strong {
-    color: var(--text);
-
-    font-size: 16px;
-
-    font-weight: 900;
-}
+        const stat =
+            event.target.closest(
+                ".water-card"
+            );
 
 
-/* =========================================================
-   BOTTOM NAV
-========================================================= */
+        if (!stat) {
 
-.bottom-nav {
-    position: fixed;
+            return;
 
-    bottom: 0;
-    left: 50%;
-
-    transform: translateX(-50%);
-
-    width: min(100%, 1100px);
-
-    background:
-        rgba(15,17,21,.96);
-
-    backdrop-filter: blur(15px);
-
-    border-top: 1px solid var(--border);
-
-    display: flex;
-
-    justify-content: space-around;
-
-    padding: 9px 8px;
-
-    z-index: 100;
-}
-
-.nav-item {
-    background: transparent;
-
-    color: var(--muted);
-
-    display: flex;
-
-    flex-direction: column;
-
-    align-items: center;
-
-    gap: 4px;
-
-    min-width: 60px;
-
-    padding: 4px;
-}
-
-.nav-item span {
-    font-size: 19px;
-}
-
-.nav-item small {
-    font-size: 9px;
-}
-
-.nav-item.active {
-    color: var(--accent);
-}
+        }
 
 
-/* =========================================================
-   RESPONSIVE
-========================================================= */
+        addWater();
 
-@media (max-width: 700px) {
-
-    .hero-card {
-        min-height: 360px;
-
-        padding: 25px;
     }
-
-    .hero-icon {
-        display: none;
-    }
-
-    .stats-grid {
-        gap: 8px;
-    }
-
-    .stat-card {
-        padding: 15px 7px;
-    }
-
-    .stat-card h2 {
-        font-size: 20px;
-    }
-
-    .level-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .challenge-card {
-        align-items: flex-start;
-    }
-
-    .challenge-number strong {
-        font-size: 40px;
-    }
-
-    .challenge-exercises {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    .day-grid {
-        grid-template-columns: repeat(5, 1fr);
-    }
-
-    .page-title h1 {
-        font-size: 32px;
-    }
-
-    .profile-popup {
-        padding: 20px;
-    }
-
-}
-
-@media (max-width: 420px) {
-
-    .topbar {
-        padding: 18px 14px;
-    }
-
-    .page {
-        padding-left: 14px;
-        padding-right: 14px;
-    }
-
-    .hero-card {
-        border-radius: 20px;
-
-        padding: 23px;
-    }
-
-    .hero-text h1 {
-        font-size: 42px;
-    }
-
-    .workout-card {
-        gap: 10px;
-    }
-
-    .workout-image {
-        min-width: 58px;
-
-        height: 58px;
-
-        font-size: 27px;
-    }
-
-    .workout-info h3 {
-        font-size: 14px;
-    }
-
-    .day-grid {
-        grid-template-columns: repeat(5, 1fr);
-    }
-
-    .challenge-exercises div {
-        padding: 12px 5px;
-    }
-
-    .gender-options {
-        gap: 8px;
-    }
-
-    .gender-card {
-        min-height: 190px;
-    }
-
-    .gender-visual {
-        transform:
-            scale(.88)
-            perspective(500px)
-            rotateY(-7deg);
-    }
-
-    .profile-popup {
-        border-radius: 22px;
-    }
-
-    .goal-card {
-        padding: 12px 9px;
-    }
-
-}
+);
